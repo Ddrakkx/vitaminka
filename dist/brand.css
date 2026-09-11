@@ -1,0 +1,147 @@
+/* Вітамінка Олени — фірмовий шар поверх style.css.
+   Зелено-біла гама категорії добавок: білі картки, зелений акцент, червоний лише на знижці. */
+
+:root{
+  --green:#1f8a4c;--green-dark:#17683a;--green-soft:#e8f5ec;--green-line:#cfe6d8;
+  --lime:#e8f5ec;--ink:#17271e;--muted:#6b7a70;--sale:#d94436;--tint:#f4f9f5;
+}
+body{background:var(--tint);line-height:1.5;font-size:15px}
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--green);outline-offset:3px}
+
+.announcement{background:var(--green);letter-spacing:.4px;font-size:12px;padding:11px 16px}
+
+/* Шапка */
+header{background:white;max-width:none;padding:18px 48px;gap:40px;border-bottom:1px solid #e4ece7}
+.logo{display:inline-block;line-height:1;color:var(--green)}
+.logo b{display:block;font-size:30px;font-weight:800;letter-spacing:-1.4px}
+.logo span{display:block;font-size:9px;font-weight:700;letter-spacing:2px;color:var(--muted);text-align:left;margin-top:5px}
+.search{background:var(--tint);border:1px solid var(--green-line);border-radius:8px;padding:9px 18px;max-width:620px}
+.search input{font-size:14px}
+.cart-button{font-weight:700}
+.cart-button span{background:var(--green);color:white}
+
+main{padding-top:28px}
+
+/* Герой */
+.hero{display:grid;grid-template-columns:1.05fr .95fr;background:white;border:1px solid #e4ece7;border-radius:14px;min-height:0;overflow:hidden}
+.hero-copy{position:static;width:auto;padding:44px 46px;align-self:center}
+.eyebrow{color:var(--green);font-size:11px;letter-spacing:2.2px;margin-bottom:16px}
+h1{font-size:clamp(34px,3.6vw,50px);font-weight:700;letter-spacing:-1.6px;line-height:1.14;color:var(--ink);margin-bottom:18px}
+h1 em{font:700 1em Manrope,Arial,sans-serif;color:var(--green);letter-spacing:-1.6px}
+h1+p{font-size:15px;line-height:1.75;color:var(--muted);max-width:46ch;margin-bottom:26px}
+.primary{background:var(--green);border-radius:8px;gap:24px;font-weight:700}
+.primary:hover{background:var(--green-dark)}
+.hero-brands{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px;font-size:12px;font-weight:700;color:var(--muted)}
+.hero-brands i{font-style:normal;color:var(--green-line)}
+.hero-products{background:var(--green-soft);display:flex;align-items:center;justify-content:center;gap:14px;padding:44px 26px}
+.hero-product{width:32%;background:white;border:1px solid var(--green-line);border-radius:12px;padding:14px 10px 10px;display:flex;flex-direction:column;align-items:center;box-shadow:0 10px 26px #17683a14}
+.hero-product img{width:100%;height:150px;object-fit:contain}
+.hero-product span{font-size:12px;font-weight:700;text-align:center;margin-top:10px;color:var(--ink)}
+.hero-product.two{transform:translateY(-18px)}
+
+/* Переваги */
+.benefits{border-bottom:0;margin-top:14px;padding:22px 0;background:white;border:1px solid #e4ece7;border-radius:12px}
+.benefits>div+div{border-left:1px solid #e4ece7}
+.benefits b{color:var(--green);border-color:var(--green-line);font-weight:800}
+.benefits span{font-size:14px}
+.benefits a{color:var(--green);text-decoration:underline;text-underline-offset:3px}
+
+/* Каталог */
+#catalog{padding:44px 0 20px}
+.section-title{align-items:flex-end;gap:20px;flex-wrap:wrap}
+.section-title .eyebrow{color:var(--green);margin-bottom:8px}
+h2{font-size:28px;font-weight:700;letter-spacing:-.8px}
+.controls{display:flex;align-items:center;gap:22px}
+.toggle{display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;white-space:nowrap;cursor:pointer}
+.toggle input{width:17px;height:17px;accent-color:var(--green);cursor:pointer}
+.sort-label{font-size:13px}
+select{background:white;border:1px solid var(--green-line);border-radius:7px;padding:8px 10px;font-size:13px}
+.chips{flex-wrap:wrap;margin:22px 0}
+.chips button{border-radius:7px;border-color:var(--green-line);background:white;font-size:13px;font-weight:600}
+.chips button:hover{border-color:var(--green)}
+.chips button.active{background:var(--green);border-color:var(--green);color:white}
+
+/* Картка товару */
+.product{background:white;border-color:#e4ece7;border-radius:12px}
+.product:hover{box-shadow:0 12px 28px #17683a14}
+.product-art{position:relative;height:220px;background:white;padding:26px 22px 6px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.art-link{display:flex;width:100%;height:100%;align-items:center;justify-content:center}
+.product-art img{width:100%;height:100%;object-fit:contain;transition:transform .25s}
+.product:hover .product-art img{transform:scale(1.04)}
+.product-art .tag{background:var(--green-soft);color:var(--green-dark);border-radius:5px;font-size:11px;font-weight:700;letter-spacing:.3px;z-index:1}
+.product-art .tag.sale{background:var(--sale);color:white}
+.product .brand{font-size:11px;font-weight:800;letter-spacing:.6px;color:var(--muted);min-height:32px;text-transform:uppercase}
+.product h3{font-size:16px;font-weight:700;min-height:44px;margin:4px 0}
+.product h3 a:hover{color:var(--green)}
+.product .meta{font-size:12px;min-height:36px;line-height:1.5;margin-bottom:10px}
+.stock{font-size:12px;font-weight:700;margin:0 0 14px;display:flex;align-items:center;gap:7px}
+.stock::before{content:'';width:7px;height:7px;border-radius:50%;background:currentColor}
+.stock.yes{color:var(--green)}
+.stock.no{color:#9aa79f}
+.price{font-size:19px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.price s{font-size:13px;font-weight:600;color:var(--muted)}
+.buy button{background:var(--green);color:white;border-radius:7px;font-weight:700;padding:11px 15px;white-space:nowrap}
+.buy button:hover{background:var(--green-dark)}
+.buy button:disabled{background:#eef2ef;color:#9aa79f;cursor:not-allowed}
+.product.out .product-art img{opacity:.45;filter:grayscale(1)}
+.listing-link{color:var(--muted);font-size:12px}
+.listing-link:hover{color:var(--green)}
+.catalog-note{line-height:1.8;font-size:12px}
+.catalog-note a{color:var(--green)}
+.empty{background:white;border:1px solid #e4ece7}
+
+/* Фінальний блок */
+.closing{background:var(--green);color:white;border-radius:14px;padding:36px 44px;align-items:center;gap:30px}
+.closing .eyebrow{color:#a8dcbe;margin-bottom:10px}
+.closing h2{font-size:26px;margin-bottom:8px}
+.closing p{color:#d5efdf;margin:0;font-size:14px}
+.closing>a{margin-left:auto;background:white;color:var(--green-dark);border-radius:8px;padding:14px 22px;font-size:14px;font-weight:800;white-space:nowrap}
+.closing>a:hover{background:var(--green-soft)}
+
+footer{background:white;max-width:none;border-top:1px solid #e4ece7;padding:26px 48px}
+footer .logo b{font-size:24px}
+footer p{font-size:12px}
+
+dialog{border-radius:14px}
+dialog::backdrop{background:#0f2b1b66}
+.dialog-head button{background:var(--tint)}
+#total{color:var(--green-dark)}
+#toast{background:var(--green-dark)}
+
+@media(max-width:1100px){
+  .hero-copy{padding:34px}
+  .hero-product img{height:120px}
+  .product-art{height:200px}
+}
+@media(max-width:900px){
+  header{padding:16px 24px;gap:20px}
+  .hero{grid-template-columns:1fr}
+  .hero-copy{padding:32px 28px}
+  .hero-products{padding:30px 20px}
+  .hero-product img{height:140px}
+  .benefits{padding:18px 6px}
+  .controls{width:100%;justify-content:space-between;gap:12px}
+}
+@media(max-width:560px){
+  header{padding:14px 18px}
+  .logo b{font-size:26px}
+  main{padding-top:18px}
+  h1{font-size:32px;letter-spacing:-1.2px}
+  h1 em{font-size:32px;letter-spacing:-1.2px}
+  h1+p br{display:none}
+  /* Гасимо оливковий градієнт і фіксовану висоту, що лишилися в style.css від попередньої теми. */
+  .hero-copy{padding:26px 22px;background:none;height:auto;width:auto}
+  .hero{min-height:0}
+  .hero-product{padding:9px 6px 7px}
+  .hero-product img{height:92px}
+  .hero-product span{font-size:11px}
+  .hero-product.two{transform:none}
+  .product-art{height:170px;padding:20px 14px 4px}
+  .product .brand{min-height:30px}
+  .product h3{min-height:40px;font-size:15px}
+  .product .meta{min-height:34px}
+  .closing{padding:26px 22px}
+  .closing>a{margin-left:0;width:100%;text-align:center}
+  footer{padding:22px 18px}
+}
+@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{transition:none!important}}
