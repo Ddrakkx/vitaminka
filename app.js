@@ -5,7 +5,7 @@
 
 /** ID опублікованої таблиці — частина адреси між /d/ та /edit.
     Порожньо = працює лише вбудований список нижче. */
-const SHEET_ID = '';
+const SHEET_ID = '1LEEEmo6IT6RwtljIHnnZglD7es9WHHJr89A_0psGLq8';
 /** Назва аркуша з каталогом. */
 const SHEET_TAB = 'Каталог';
 
