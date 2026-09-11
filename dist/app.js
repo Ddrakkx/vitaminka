@@ -3,11 +3,12 @@
    Якщо таблиця не задана або тимчасово недоступна — показуємо вбудований список,
    щоб вітрина ніколи не була порожньою. */
 
-/** ID опублікованої таблиці — частина адреси між /d/ та /edit.
+/** Адреса опублікованого аркуша «Каталог» у форматі CSV.
+    Отримана через Файл → Поділитися → Опублікувати в інтернеті (аркуш «Каталог»).
+    Там же увімкнено «Автоматично публікувати після внесення змін», тому правки
+    Олени в таблиці підхоплюються самі — переопубліковувати нічого не треба.
     Порожньо = працює лише вбудований список нижче. */
-const SHEET_ID = '1LEEEmo6IT6RwtljIHnnZglD7es9WHHJr89A_0psGLq8';
-/** Назва аркуша з каталогом. */
-const SHEET_TAB = 'Каталог';
+const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTTv1x3XpoipqPKO8__EuZF8XoK176_vkKXVq10I-MV-U_u2X7nvRF_fnC8K7OrEAEqZ-6hH5WxedaY/pub?gid=437180012&single=true&output=csv';
 
 /** Резервний каталог. Ціни звірено з оголошеннями продавця 11.09.2026. */
 const FALLBACK = [
@@ -121,10 +122,9 @@ function rowsToProducts(rows) {
 }
 
 async function loadCatalog() {
-  if (!SHEET_ID) return FALLBACK.map(p => ({...p, id: hashId(p.name + p.brand)}));
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}`;
+  if (!SHEET_CSV_URL) return FALLBACK.map(p => ({...p, id: hashId(p.name + p.brand)}));
   try {
-    const res = await fetch(url, {signal: AbortSignal.timeout(8000)});
+    const res = await fetch(SHEET_CSV_URL, {signal: AbortSignal.timeout(8000)});
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = rowsToProducts(parseCsv(await res.text()));
     if (!data.length) throw new Error('Таблиця порожня');
@@ -197,6 +197,40 @@ function renderCart() {
     <div class="quantity"><button data-minus="${p.id}" aria-label="Зменшити кількість ${esc(p.name)}">−</button><span>${cart[p.id]}</span><button data-plus="${p.id}" aria-label="Збільшити кількість ${esc(p.name)}">+</button></div>
   </div>`).join('') : '<p>Тут поки порожньо. Оберіть щось у каталозі.</p>';
   $('#total').textContent = items.length ? 'Разом: ' + money(items.reduce((s, p) => s + p.price * cart[p.id], 0)) : '';
+  $('#copy-order').disabled = !items.length;
+}
+
+/** Готовий текст замовлення — покупець копіює й надсилає Олені в Kidstaff. */
+function orderText() {
+  const items = products.filter(p => cart[p.id]);
+  if (!items.length) return '';
+  const lines = items.map((p, i) =>
+    `${i + 1}. ${p.brand ? p.brand + ' — ' : ''}${p.name}${p.detail ? ', ' + p.detail : ''}` +
+    ` — ${money(p.price)} × ${cart[p.id]} = ${money(p.price * cart[p.id])}` +
+    (p.url ? '\n   ' + p.url : ''));
+  const total = items.reduce((s, p) => s + p.price * cart[p.id], 0);
+  return `Доброго дня! Хочу замовити з сайту «Вітамінка Олени»:\n\n${lines.join('\n')}\n\n` +
+    `Разом: ${money(total)}\n\nПідкажіть, будь ласка, наявність і спосіб доставки.`;
+}
+
+async function copyOrder() {
+  const text = orderText();
+  if (!text) return;
+  try {
+    await navigator.clipboard.writeText(text);
+  } catch {
+    // Clipboard API недоступний (старий браузер, не-HTTPS) — старий надійний спосіб.
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.setAttribute('readonly', '');
+    ta.style.cssText = 'position:fixed;top:-1000px';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); } finally { ta.remove(); }
+  }
+  const b = $('#copy-order');
+  b.textContent = 'Скопійовано ✓';
+  setTimeout(() => { b.textContent = 'Скопіювати замовлення'; }, 2200);
 }
 
 function add(id) {
@@ -228,6 +262,7 @@ document.addEventListener('click', e => {
 $('#search').addEventListener('input', render);
 $('#sort').addEventListener('change', render);
 $('#in-stock').addEventListener('change', e => { inStockOnly = e.target.checked; render(); });
+$('#copy-order').onclick = copyOrder;
 $('#open-cart').onclick = () => { $('#cart').showModal(); renderCart(); };
 $('#close-cart').onclick = $('#continue').onclick = () => $('#cart').close();
 $('#cart').addEventListener('click', e => {

@@ -108,6 +108,27 @@ dialog::backdrop{background:#0f2b1b66}
 #total{color:var(--green-dark)}
 #toast{background:var(--green-dark)}
 
+/* Соцдоказ: цифри-пігулки замість порядкових номерів */
+.benefits{grid-template-columns:repeat(4,1fr)}
+.benefits b{border-radius:999px;padding:7px 14px;font-size:14px;font-weight:800;white-space:nowrap;background:var(--green-soft)}
+
+/* Як замовити */
+.howto{background:white;border:1px solid #e4ece7;border-radius:14px;padding:34px 44px;margin-bottom:20px}
+.howto h2{margin-bottom:24px}
+.howto ol{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:26px}
+.howto li{display:flex;gap:14px;align-items:flex-start}
+.howto li b{flex:0 0 auto;width:30px;height:30px;display:grid;place-items:center;border-radius:50%;background:var(--green);color:white;font-size:14px;font-weight:800}
+.howto li span{font-size:15px;font-weight:700;color:var(--ink)}
+.howto li small{display:block;font-size:13px;font-weight:400;color:var(--muted);line-height:1.6;margin-top:5px}
+
+/* Кошик */
+.cart-actions{display:flex;align-items:center;gap:16px;margin:20px 0 14px;flex-wrap:wrap}
+.cart-actions .primary{flex:1;justify-content:center;gap:0;min-width:200px}
+.cart-actions .primary:disabled{background:#eef2ef;color:#9aa79f;cursor:not-allowed}
+.cart-write{font-size:14px;font-weight:700;color:var(--green);text-decoration:underline;text-underline-offset:3px;white-space:nowrap}
+.ghost{display:block;width:100%;margin-top:6px;background:none;border:1px solid var(--green-line);border-radius:8px;padding:11px;font-size:14px;font-weight:600;color:var(--muted)}
+.ghost:hover{border-color:var(--green);color:var(--green)}
+
 @media(max-width:1100px){
   .hero-copy{padding:34px}
   .hero-product img{height:120px}
@@ -119,8 +140,11 @@ dialog::backdrop{background:#0f2b1b66}
   .hero-copy{padding:32px 28px}
   .hero-products{padding:30px 20px}
   .hero-product img{height:140px}
-  .benefits{padding:18px 6px}
+  .benefits{padding:18px 6px;grid-template-columns:repeat(2,1fr)}
+  .benefits>div:nth-child(3){border-left:0}
   .controls{width:100%;justify-content:space-between;gap:12px}
+  .howto{padding:28px}
+  .howto ol{grid-template-columns:1fr;gap:18px}
 }
 @media(max-width:560px){
   header{padding:14px 18px}
@@ -140,6 +164,10 @@ dialog::backdrop{background:#0f2b1b66}
   .product .brand{min-height:30px}
   .product h3{min-height:40px;font-size:15px}
   .product .meta{min-height:34px}
+  .benefits{grid-template-columns:1fr}
+  .howto{padding:24px 20px}
+  .cart-actions{gap:10px}
+  .cart-actions .primary{min-width:0}
   .closing{padding:26px 22px}
   .closing>a{margin-left:0;width:100%;text-align:center}
   footer{padding:22px 18px}
