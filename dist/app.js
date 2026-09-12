@@ -34,6 +34,7 @@ const PLACEHOLDER = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg
 
 /** Розбір CSV з підтримкою лапок, ком і переносів усередині клітинок. */
 function parseCsv(text) {
+  if (text.charCodeAt(0) === 0xFEFF) text = text.slice(1); // BOM з експортованих файлів
   const rows = []; let row = [], cell = '', quoted = false;
   for (let i = 0; i < text.length; i++) {
     const c = text[i];
@@ -102,8 +103,11 @@ function rowsToProducts(rows) {
   const out = [], seen = new Set();
 
   for (const r of rows.slice(1)) {
-    const name = get(r, 'name'), price = num(get(r, 'price'));
+    const name = get(r, 'name'), rawPrice = get(r, 'price'), price = num(rawPrice);
     if (name.length < 2 || !Number.isFinite(price) || price <= 0) continue;
+    // «від 135» — оголошення, де кілька товарів і 135 це найдешевший.
+    // Без \b: у JS він працює лише по латиниці, тож після кириличної «д» межі слова немає.
+    const priceFrom = /^\s*(від|от|from)[\s.:]/i.test(rawPrice);
     const id = hashId(name + get(r, 'brand'));
     if (seen.has(id)) continue;
     seen.add(id);
@@ -116,7 +120,7 @@ function rowsToProducts(rows) {
       brand: get(r, 'brand'),
       category: get(r, 'category') || 'Інше',
       detail: get(r, 'detail'),
-      price,
+      price, priceFrom,
       oldPrice: Number.isFinite(oldPrice) && oldPrice > price ? oldPrice : 0,
       // Порожня клітинка означає «є»: так Олені не треба заповнювати колонку для звичайних товарів.
       stock: raw === '' || TRUTHY.includes(raw),
@@ -193,7 +197,7 @@ function render() {
         <p class="meta">${esc(p.detail)}</p>
         <p class="stock ${p.stock ? 'yes' : 'no'}">${p.stock ? 'В наявності' : 'Немає в наявності'}</p>
         <div class="buy">
-          <span class="price">${money(p.price)}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ''}</span>
+          <span class="price">${p.priceFrom ? '<em>від</em> ' : ''}${money(p.price)}${p.oldPrice ? `<s>${money(p.oldPrice)}</s>` : ''}</span>
           ${p.stock
             ? `<button data-add="${p.id}" aria-label="Додати ${esc(p.name)} до кошика">До кошика +</button>`
             : `<button disabled aria-label="${esc(p.name)} немає в наявності">Немає</button>`}
@@ -223,7 +227,7 @@ function orderText() {
   if (!items.length) return '';
   const lines = items.map((p, i) =>
     `${i + 1}. ${p.brand ? p.brand + ' — ' : ''}${p.name}${p.detail ? ', ' + p.detail : ''}` +
-    ` — ${money(p.price)} × ${cart[p.id]} = ${money(p.price * cart[p.id])}` +
+    ` — ${p.priceFrom ? 'від ' : ''}${money(p.price)} × ${cart[p.id]} = ${p.priceFrom ? 'від ' : ''}${money(p.price * cart[p.id])}` +
     (p.url ? '\n   ' + p.url : ''));
   const total = items.reduce((s, p) => s + p.price * cart[p.id], 0);
   return `Доброго дня! Хочу замовити з сайту «Вітамінка Олени»:\n\n${lines.join('\n')}\n\n` +

@@ -80,6 +80,7 @@ select{background:white;border:1px solid var(--green-line);border-radius:7px;pad
 .stock.no{color:#9aa79f}
 .price{font-size:19px;font-weight:800;letter-spacing:-.5px;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
 .price s{font-size:13px;font-weight:600;color:var(--muted)}
+.price em{font-style:normal;font-size:12px;font-weight:600;color:var(--muted);letter-spacing:0}
 .buy button{background:var(--green);color:white;border-radius:7px;font-weight:700;padding:11px 15px;white-space:nowrap}
 .buy button:hover{background:var(--green-dark)}
 .buy button:disabled{background:#eef2ef;color:#9aa79f;cursor:not-allowed}
