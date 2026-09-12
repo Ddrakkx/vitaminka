@@ -124,7 +124,11 @@ function rowsToProducts(rows) {
 async function loadCatalog() {
   if (!SHEET_CSV_URL) return FALLBACK.map(p => ({...p, id: hashId(p.name + p.brand)}));
   try {
-    const res = await fetch(SHEET_CSV_URL, {signal: AbortSignal.timeout(8000)});
+    // Google віддає опублікований CSV із Cache-Control: max-age=300, тому браузер
+    // до п'яти хвилин показував би стару копію після правок у таблиці.
+    // Унікальний параметр + no-store змушують щоразу питати свіже.
+    const res = await fetch(SHEET_CSV_URL + '&_=' + Date.now(),
+      {cache: 'no-store', signal: AbortSignal.timeout(8000)});
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = rowsToProducts(parseCsv(await res.text()));
     if (!data.length) throw new Error('Таблиця порожня');
