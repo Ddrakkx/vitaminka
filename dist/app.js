@@ -3,12 +3,18 @@
    Якщо таблиця не задана або тимчасово недоступна — показуємо вбудований список,
    щоб вітрина ніколи не була порожньою. */
 
-/** Адреса опублікованого аркуша «Каталог» у форматі CSV.
-    Отримана через Файл → Поділитися → Опублікувати в інтернеті (аркуш «Каталог»).
-    Там же увімкнено «Автоматично публікувати після внесення змін», тому правки
-    Олени в таблиці підхоплюються самі — переопубліковувати нічого не треба.
-    Порожньо = працює лише вбудований список нижче. */
-const SHEET_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTTv1x3XpoipqPKO8__EuZF8XoK176_vkKXVq10I-MV-U_u2X7nvRF_fnC8K7OrEAEqZ-6hH5WxedaY/pub?gid=437180012&single=true&output=csv';
+/** Основне джерело: читання документа напряму.
+    Віддає те, що в таблиці просто зараз. Працює лише якщо документу відкрито
+    доступ за посиланням (Налаштування доступу → «Усі, хто має посилання» → Читач). */
+const SHEET_ID = '1LEEEmo6IT6RwtljIHnnZglD7es9WHHJr89A_0psGLq8';
+const SHEET_TAB = 'Каталог';
+
+/** Запасне джерело: опублікований аркуш.
+    Це НЕ сама таблиця, а знімок, який Google пересобирає й розкладає по своїх вузлах
+    із різною швидкістю: два запити поспіль можуть повернути різні версії.
+    Саме тому наявність оновлювалась «через раз». Лишаємо як запасний варіант —
+    краще трохи застарілі дані, ніж порожня вітрина. */
+const SHEET_PUB_CSV_URL = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vTTv1x3XpoipqPKO8__EuZF8XoK176_vkKXVq10I-MV-U_u2X7nvRF_fnC8K7OrEAEqZ-6hH5WxedaY/pub?gid=437180012&single=true&output=csv';
 
 /** Резервний каталог. Ціни звірено з оголошеннями продавця 11.09.2026. */
 const FALLBACK = [
@@ -121,21 +127,28 @@ function rowsToProducts(rows) {
   return out;
 }
 
+/** Один рівень джерела: тягнемо CSV і розбираємо. Кидає помилку, якщо не вийшло.
+    Унікальний параметр і no-store потрібні, бо Google віддає CSV
+    із Cache-Control: max-age=300 — інакше браузер до п'яти хвилин тримав би стару копію. */
+async function fetchSheet(url) {
+  const res = await fetch(url + (url.includes('?') ? '&' : '?') + '_=' + Date.now(),
+    {cache: 'no-store', signal: AbortSignal.timeout(8000)});
+  if (!res.ok) throw new Error('HTTP ' + res.status);
+  const data = rowsToProducts(parseCsv(await res.text()));
+  if (!data.length) throw new Error('Порожній каталог');
+  return data;
+}
+
 async function loadCatalog() {
-  if (!SHEET_CSV_URL) return FALLBACK.map(p => ({...p, id: hashId(p.name + p.brand)}));
-  try {
-    // Google віддає опублікований CSV із Cache-Control: max-age=300, тому браузер
-    // до п'яти хвилин показував би стару копію після правок у таблиці.
-    // Унікальний параметр + no-store змушують щоразу питати свіже.
-    const res = await fetch(SHEET_CSV_URL + '&_=' + Date.now(),
-      {cache: 'no-store', signal: AbortSignal.timeout(8000)});
-    if (!res.ok) throw new Error('HTTP ' + res.status);
-    const data = rowsToProducts(parseCsv(await res.text()));
-    if (!data.length) throw new Error('Таблиця порожня');
-    return data;
-  } catch {
-    return FALLBACK.map(p => ({...p, id: hashId(p.name + p.brand)}));
+  const gviz = SHEET_ID &&
+    `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv&sheet=${encodeURIComponent(SHEET_TAB)}`;
+  // Спершу жива таблиця, потім знімок, і лише тоді вбудований список:
+  // вітрина не має падати через те, що Google повільний.
+  for (const url of [gviz, SHEET_PUB_CSV_URL]) {
+    if (!url) continue;
+    try { return await fetchSheet(url); } catch {}
   }
+  return FALLBACK.map(p => ({...p, id: hashId(p.name + p.brand)}));
 }
 
 /* ── Вітрина ───────────────────────────────────────────────────────── */
